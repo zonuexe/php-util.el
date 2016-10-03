@@ -60,12 +60,14 @@
 (defvar php-util--re-classlike-pattern
   (php-create-regexp-for-classlike (regexp-opt '("class" "interface" "trait"))))
 
+;;;###autoload
 (defun php-util-get-current-element (re-pattern)
   "Return backward matched element by RE-PATTERN."
   (save-excursion
     (when (re-search-backward re-pattern nil t)
       (match-string-no-properties 1))))
 
+;;;###autoload
 (defun php-util-insert-current-class ()
   "Insert current class name if cursor in class context."
   (interactive)
@@ -73,6 +75,7 @@
     (when matched
       (insert (concat matched php-util-class-suffix-when-insert)))))
 
+;;;###autoload
 (defun php-util-insert-current-namespace ()
   "Insert current namespace if cursor in in namespace context."
   (interactive)
