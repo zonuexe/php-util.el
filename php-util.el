@@ -38,6 +38,7 @@
 ;;; Code:
 
 (require 'php-mode)
+(require 'regexp-opt)
 
 (defgroup php-util nil
   "Utility for editiong PHP."
