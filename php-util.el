@@ -61,6 +61,23 @@
 (defvar php-util--re-classlike-pattern
   (php-create-regexp-for-classlike (regexp-opt '("class" "interface" "trait"))))
 
+(defun php-util-run-php-builtin-web-server (dir-or-router hostname port)
+  "Run PHP Builtin-server."
+  (interactive
+   (list (read-file-name "Document root: ")
+         (read-string "Hostname: " "0.0.0.0")
+         (read-number "Port:" 3939)))
+  (let* ((opt-t (if (f-dir? dir-or-router) "-t " ""))
+         (pattern (eval `(rx bos ,(getenv "HOME"))))
+         (short-dirname (replace-regexp-in-string pattern "~" dir-or-router))
+         (buf-name (format "php -S %s:%s %s%s" hostname port opt-t short-dirname)))
+    (message "Run PHP built-in server: %s" buf-name)
+    (make-comint buf-name "php" nil "-S"
+                 (format "%s:%s" hostname port)
+                 (if (f-dir? dir-or-router) "-t" "")
+                 dir-or-router)
+    (display-buffer (format "*%s*" buf-name))))
+
 ;;;###autoload
 (defun php-util-get-current-element (re-pattern)
   "Return backward matched element by RE-PATTERN."
