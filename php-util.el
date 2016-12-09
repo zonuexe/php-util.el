@@ -61,6 +61,7 @@
 (defvar php-util--re-classlike-pattern
   (php-create-regexp-for-classlike (regexp-opt '("class" "interface" "trait"))))
 
+;;;###autoload
 (defun php-util-run-php-builtin-web-server (dir-or-router hostname port)
   "Run PHP Builtin-server."
   (interactive
