@@ -55,6 +55,23 @@
   "Suffix for inserted namespace."
   :type 'string)
 
+(defcustom php-util-thingatpt-php-token-script "
+$point = $_SERVER['argv'][1];
+
+$offset = 0;
+foreach (token_get_all(file_get_contents('php://stdin')) as $token) {
+    $s = is_array($token) ? $token[1] : $token;
+    $l = mb_strlen($s);
+    if ($offset + $l > $point) {
+        echo $s;
+        exit;
+    }
+
+    $offset += $l;
+}
+"
+  "PHP tokenize script for `thing-at-point'.")
+
 (defvar php-util--re-namespace-pattern
   (php-create-regexp-for-classlike "namespace"))
 
@@ -101,6 +118,26 @@
   (let ((matched (php-util-get-current-element php-util--re-namespace-pattern)))
     (when matched
       (insert (concat matched php-util-namespace-suffix-when-insert)))))
+
+;;;###autoload
+(defun php-util-thingatpt-php-token (&optional point)
+  "Return the PHP Token at `POINT'."
+  (unless point (setq point (point)))
+  (unless (integerp point)
+    (error "`point' is not integer"))
+  (let ((in (current-buffer)) out)
+    (with-temp-buffer
+      (setq out (current-buffer))
+      (with-current-buffer in
+        (call-process-region
+         (point-min) (point-max)
+         "php" nil out nil "-r" php-util-thingatpt-php-token-script (number-to-string point)))
+      (buffer-substring-no-properties (point-min) (point-max)))))
+
+;;;###autoload
+(defun php-util-register-thing-at-point ()
+  "Register functions for `thing-at-point'."
+  (put 'php-token 'thing-at-point 'php-util-thingatpt-php-token))
 
 (provide 'php-util)
 ;;; php-util.el ends here
