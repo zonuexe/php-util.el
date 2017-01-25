@@ -78,6 +78,20 @@ foreach (token_get_all(file_get_contents('php://stdin')) as $token) {
 (defvar php-util--re-classlike-pattern
   (php-create-regexp-for-classlike (regexp-opt '("class" "interface" "trait"))))
 
+(defconst php-util--re-function-or-method-pattern
+  "^\\s-*\\(?:\\(?:public\\|private\\|static\\|final\\)\\s-*\\)*function\\s-+\\(\\(?:\\sw\\|\\s_\\)+\\)\\s-*(")
+
+;;;###autoload
+(defun php-util-copyit-fqsen ()
+  "Copy/kill class/method FQSEN."
+  (interactive)
+  (let ((namespace  (or (php-util-get-current-element php-util--re-namespace-pattern) ""))
+        (class      (or (php-util-get-current-element php-util--re-classlike-pattern) ""))
+        (namedfunc  (php-util-get-current-element php-util--re-function-or-method-pattern)))
+    (kill-new (concat (if (string= namespace "") "" (concat "\\" namespace))
+                      (if (string= class "") "" (concat "\\" class "::"))
+                      (if (string= namedfunc "") "" (concat namedfunc "()"))))))
+
 ;;;###autoload
 (defun php-util-run-php-builtin-web-server (dir-or-router hostname port)
   "Run PHP Builtin-server."
