@@ -2,5 +2,3 @@
 (source "melpa" "https://melpa.org/packages/")
 
 (package-file "php-util.el")
-
-(depends-on "php-mode")
