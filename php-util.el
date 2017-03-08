@@ -7,7 +7,7 @@
 ;; Version: 0.0.1
 ;; Keywords: languages php
 ;; Homepage: https://github.com/zonuexe/emacs-copyit
-;; Package-Requires: ((emacs "24") (cl-lib "0.5") (php-mode "1.15"))
+;; Package-Requires: ((emacs "24") (cl-lib "0.5") (php-mode "1.15") (f "0.16.0"))
 
 ;; This file is NOT part of GNU Emacs.
 
@@ -37,6 +37,7 @@
 
 ;;; Code:
 
+(require 'f)
 (require 'php-mode)
 (require 'regexp-opt)
 
@@ -93,13 +94,24 @@ foreach (token_get_all(file_get_contents('php://stdin')) as $token) {
                       (if (string= namedfunc "") "" (concat namedfunc "()"))))))
 
 ;;;###autoload
-(defun php-util-run-php-builtin-web-server (dir-or-router hostname port)
+(defun php-util-run-php-builtin-web-server (dir-or-router hostname port &optional document-root)
   "Run PHP Builtin-server."
   (interactive
-   (list (read-file-name "Document root: ")
-         (read-string "Hostname: " "0.0.0.0")
-         (read-number "Port:" 3939)))
-  (let* ((opt-t (if (f-dir? dir-or-router) "-t " ""))
+   (let ((insert-default-directory t)
+         (d-o-r (read-file-name "Document root or Script: " default-directory)))
+     (list
+      d-o-r
+      (read-string "Hostname: " "0.0.0.0")
+      (read-number "Port:" 3939)
+      (if (f-dir? d-o-r)
+          dir-or-router
+        (let ((root-input (read-file-name "Document root: " (f-dirname d-o-r))))
+          (if (f-dir? root-input) root-input (f-dirname root-input)))))))
+  (let* ((default-directory (or document-root
+                                (if (f-dir? dir-or-router)
+                                    dir-or-router
+                                  default-directory)))
+         (opt-t (if (f-dir? dir-or-router) "-t " ""))
          (pattern (eval `(rx bos ,(getenv "HOME"))))
          (short-dirname (replace-regexp-in-string pattern "~" dir-or-router))
          (buf-name (format "php -S %s:%s %s%s" hostname port opt-t short-dirname)))
@@ -107,7 +119,7 @@ foreach (token_get_all(file_get_contents('php://stdin')) as $token) {
     (make-comint buf-name "php" nil "-S"
                  (format "%s:%s" hostname port)
                  (if (f-dir? dir-or-router) "-t" "")
-                 dir-or-router)
+                 (concat dir-or-router (if (f-dir? dir-or-router) "" "/")))
     (display-buffer (format "*%s*" buf-name))))
 
 ;;;###autoload
