@@ -6,7 +6,7 @@
 ;; Created: 4 Oct 2016
 ;; Version: 0.0.1
 ;; Keywords: languages php
-;; Homepage: https://github.com/zonuexe/emacs-copyit
+;; Homepage: https://github.com/zonuexe/php-util.el
 ;; Package-Requires: ((emacs "24") (cl-lib "0.5") (php-mode "1.15") (f "0.16.0"))
 
 ;; This file is NOT part of GNU Emacs.
