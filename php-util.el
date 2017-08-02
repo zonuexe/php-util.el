@@ -7,7 +7,7 @@
 ;; Version: 0.0.1
 ;; Keywords: languages php
 ;; Homepage: https://github.com/zonuexe/php-util.el
-;; Package-Requires: ((emacs "24") (cl-lib "0.5") (php-mode "1.15") (f "0.16.0"))
+;; Package-Requires: ((emacs "24") (cl-lib "0.5") (php-mode "1.18") (f "0.16.0"))
 
 ;; This file is NOT part of GNU Emacs.
 
@@ -130,20 +130,10 @@ foreach (token_get_all(file_get_contents('php://stdin')) as $token) {
       (match-string-no-properties 1))))
 
 ;;;###autoload
-(defun php-util-insert-current-class ()
-  "Insert current class name if cursor in class context."
-  (interactive)
-  (let ((matched (php-util-get-current-element php-util--re-classlike-pattern)))
-    (when matched
-      (insert (concat matched php-util-class-suffix-when-insert)))))
+(define-obsolete-function-alias 'php-util-insert-current-class 'php-current-class)
 
 ;;;###autoload
-(defun php-util-insert-current-namespace ()
-  "Insert current namespace if cursor in in namespace context."
-  (interactive)
-  (let ((matched (php-util-get-current-element php-util--re-namespace-pattern)))
-    (when matched
-      (insert (concat matched php-util-namespace-suffix-when-insert)))))
+(define-obsolete-function-alias 'php-util-insert-current-namespace 'php-current-namespace)
 
 ;;;###autoload
 (defun php-util-thingatpt-php-token (&optional point)
