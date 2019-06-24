@@ -121,7 +121,7 @@ foreach (token_get_all(file_get_contents('php://stdin')) as $token) {
                       default-directory
                       (when document-root dir-or-router)))))
     (message "Run PHP built-in server: %s" buf-name)
-    (apply #'make-comint buf-name "php" nil args)
+    (apply #'make-comint buf-name php-executable nil args)
     (display-buffer (format "*%s*" buf-name))))
 
 ;;;###autoload
