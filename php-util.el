@@ -105,9 +105,8 @@ foreach (token_get_all(file_get_contents('php://stdin')) as $token) {
                 (if (f-dir? dir-or-router)
                     dir-or-router
                   (f-dirname dir-or-router)))))
-         (opt-t (or document-root dir-or-router))
          (pattern (rx-form `(: bos ,(getenv "HOME"))))
-         (short-dirname (replace-regexp-in-string pattern "~" opt-t))
+         (short-dirname (replace-regexp-in-string pattern "~" default-directory))
          (short-filename (replace-regexp-in-string pattern "~" dir-or-router))
          (buf-name (format "php -S %s:%s -t %s %s"
                            hostname
@@ -119,7 +118,7 @@ foreach (token_get_all(file_get_contents('php://stdin')) as $token) {
                 (list "-S"
                       (format "%s:%d" hostname port)
                       "-t"
-                      opt-t
+                      default-directory
                       (when document-root dir-or-router)))))
     (message "Run PHP built-in server: %s" buf-name)
     (apply #'make-comint buf-name "php" nil args)
