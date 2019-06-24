@@ -48,14 +48,6 @@
   :group 'tools
   :group 'php)
 
-(defcustom php-util-class-suffix-when-insert "::"
-  "Suffix for inserted class."
-  :type 'string)
-
-(defcustom php-util-namespace-suffix-when-insert "\\"
-  "Suffix for inserted namespace."
-  :type 'string)
-
 (defcustom php-util-thingatpt-php-token-script "
 $point = $_SERVER['argv'][1];
 
@@ -128,12 +120,6 @@ foreach (token_get_all(file_get_contents('php://stdin')) as $token) {
   (save-excursion
     (when (re-search-backward re-pattern nil t)
       (match-string-no-properties 1))))
-
-;;;###autoload
-(define-obsolete-function-alias 'php-util-insert-current-class 'php-current-class)
-
-;;;###autoload
-(define-obsolete-function-alias 'php-util-insert-current-namespace 'php-current-namespace)
 
 ;;;###autoload
 (defun php-util-thingatpt-php-token (&optional point)
