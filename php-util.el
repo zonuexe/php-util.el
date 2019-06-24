@@ -92,26 +92,37 @@ foreach (token_get_all(file_get_contents('php://stdin')) as $token) {
    (let ((insert-default-directory t)
          (d-o-r (read-file-name "Document root or Script: " default-directory)))
      (list
-      d-o-r
+      (expand-file-name d-o-r)
       (read-string "Hostname: " "0.0.0.0")
       (read-number "Port:" 3939)
       (if (f-dir? d-o-r)
-          dir-or-router
+          nil
         (let ((root-input (read-file-name "Document root: " (f-dirname d-o-r))))
-          (if (f-dir? root-input) root-input (f-dirname root-input)))))))
-  (let* ((default-directory (or document-root
-                                (if (f-dir? dir-or-router)
-                                    dir-or-router
-                                  default-directory)))
-         (opt-t (if (f-dir? dir-or-router) "-t " ""))
-         (pattern (eval `(rx bos ,(getenv "HOME"))))
-         (short-dirname (replace-regexp-in-string pattern "~" dir-or-router))
-         (buf-name (format "php -S %s:%s %s%s" hostname port opt-t short-dirname)))
+          (expand-file-name (if (f-dir? root-input) root-input (f-dirname root-input))))))))
+  (let* ((default-directory
+           (expand-file-name
+            (or document-root
+                (if (f-dir? dir-or-router)
+                    dir-or-router
+                  (f-dirname dir-or-router)))))
+         (opt-t (or document-root dir-or-router))
+         (pattern (rx-form `(: bos ,(getenv "HOME"))))
+         (short-dirname (replace-regexp-in-string pattern "~" opt-t))
+         (short-filename (replace-regexp-in-string pattern "~" dir-or-router))
+         (buf-name (format "php -S %s:%s -t %s %s"
+                           hostname
+                           port
+                           short-dirname
+                           (if document-root short-filename "")))
+         (args (cl-remove-if
+                #'null
+                (list "-S"
+                      (format "%s:%d" hostname port)
+                      "-t"
+                      opt-t
+                      (when document-root dir-or-router)))))
     (message "Run PHP built-in server: %s" buf-name)
-    (make-comint buf-name "php" nil "-S"
-                 (format "%s:%s" hostname port)
-                 (if (f-dir? dir-or-router) "-t" "")
-                 (concat dir-or-router (if (f-dir? dir-or-router) "" "/")))
+    (apply #'make-comint buf-name "php" nil args)
     (display-buffer (format "*%s*" buf-name))))
 
 ;;;###autoload
